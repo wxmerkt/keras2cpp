@@ -293,12 +293,15 @@ keras::DataChunk* keras::LayerDense::compute_output(keras::DataChunk* dc) {
   vector<float> y_ret(m_weights[0].size(), 0.0);
   auto const & im = dc->get_1d();
 
-  for (unsigned int j = 0; j < m_weights.size(); ++j) { // iter over input
-    for (unsigned int i = 0; i < m_weights[j].size(); ++i) { // iter over neurons
+  #pragma omp parallel for
+  for (int j = 0; j < m_weights.size(); ++j) { // iter over input
+    for (int i = 0; i < m_weights[j].size(); ++i) { // iter over neurons
       y_ret[i] += m_weights[j][i] * im[j];
     }
   }
-  for (unsigned int i = 0; i < m_weights[0].size(); ++i) { // add biases
+
+  #pragma omp parallel for
+  for (int i = 0; i < m_weights[0].size(); ++i) { // add biases
     y_ret[i] += m_bias[i];
   }
 
