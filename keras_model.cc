@@ -6,6 +6,7 @@
 #include <math.h>
 using namespace std;
 
+//#define DEBUG
 
 std::vector<float> keras::read_1d_array(std::ifstream &fin, int cols) {
   vector<float> arr;
@@ -41,7 +42,9 @@ void keras::LayerConv2D::load_weights(std::ifstream &fin) {
   string tmp_str = "";
   float tmp_float;
   fin >> m_kernels_cnt >> m_depth >> m_rows >> m_cols;
+#ifdef DEBUG
   cout << "LayerConv2D " << m_kernels_cnt << "x" << m_depth << "x" << m_rows << "x" << m_cols << endl;
+#endif
   // reading kernel weights
   for(int k = 0; k < m_kernels_cnt; ++k) {
     vector<vector<vector<float> > > tmp_depths;
@@ -73,12 +76,16 @@ void keras::LayerConv2D::load_weights(std::ifstream &fin) {
 
 void keras::LayerActivation::load_weights(std::ifstream &fin) {
   fin >> m_activation_type;
+#ifdef DEBUG
   cout << "Activation type " << m_activation_type << endl;
+#endif
 }
 
 void keras::LayerMaxPooling::load_weights(std::ifstream &fin) {
   fin >> m_pool_x >> m_pool_y;
+#ifdef DEBUG
   cout << "MaxPooling " << m_pool_x << "x" << m_pool_y << endl;
+#endif
 }
 
 void keras::LayerDense::load_weights(std::ifstream &fin) {
@@ -95,14 +102,18 @@ void keras::LayerDense::load_weights(std::ifstream &fin) {
     fin >> tmp_char; // for ']'
     m_weights.push_back(tmp_n);
   }
+#ifdef DEBUG
   cout << "weights " << m_weights.size() << endl;
+#endif
   fin >> tmp_char; // for '['
   for(int n = 0; n < m_neurons; ++n) {
     fin >> tmp_float;
     m_bias.push_back(tmp_float);
   }
   fin >> tmp_char; // for ']'
+#ifdef DEBUG
   cout << "bias " << m_bias.size() << endl;
+#endif
 
 }
 
@@ -328,18 +339,24 @@ std::vector<float> keras::KerasModel::compute_output(keras::DataChunk *dc) {
 }
 
 void keras::KerasModel::load_weights(const string &input_fname) {
+#ifdef DEBUG
   cout << "Reading model from " << input_fname << endl;
+#endif
   ifstream fin(input_fname.c_str());
   string layer_type = "";
   string tmp_str = "";
   int tmp_int = 0;
 
   fin >> tmp_str >> m_layers_cnt;
+#ifdef DEBUG
   cout << "Layers " << m_layers_cnt << endl;
+#endif
 
   for(int layer = 0; layer < m_layers_cnt; ++layer) { // iterate over layers
     fin >> tmp_str >> tmp_int >> layer_type;
+#ifdef DEBUG
     cout << "Layer " << tmp_int << " " << layer_type << endl;
+#endif
 
     Layer *l = 0L;
     if(layer_type == "Convolution2D") {
