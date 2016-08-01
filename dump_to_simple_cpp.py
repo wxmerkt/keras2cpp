@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import numpy as np
 np.random.seed(1337)
 from keras.models import Sequential, model_from_json
