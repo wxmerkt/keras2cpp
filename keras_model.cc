@@ -290,19 +290,22 @@ keras::DataChunk* keras::LayerDense::compute_output(keras::DataChunk* dc) {
   //cout << "weights: input size " << m_weights.size() << endl;
   //cout << "weights: neurons size " << m_weights[0].size() << endl;
   //cout << "bias " << m_bias.size() << endl;
+  
   vector<float> y_ret(m_weights[0].size(), 0.0);
   auto const & im = dc->get_1d();
 
-  #pragma omp parallel for
   for (int j = 0; j < m_weights.size(); ++j) { // iter over input
     for (int i = 0; i < m_weights[j].size(); ++i) { // iter over neurons
       y_ret[i] += m_weights[j][i] * im[j];
     }
   }
 
-  #pragma omp parallel for
+  // #pragma omp simd
   for (int i = 0; i < m_weights[0].size(); ++i) { // add biases
     y_ret[i] += m_bias[i];
+    // wxm try sigmoid
+    y_ret[i] = 1.0/(1.0+exp(-y_ret[i])); // very slow though!
+    // y_ret[i] = y_ret[i] / (1 + fabs(y_ret[i]));
   }
 
   keras::DataChunk *out = new DataChunkFlat();
